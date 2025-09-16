@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kết quả của tôi</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{ --brand:#a00000; --brand-600:#8b0000; --bg:#f5f6f8; --card:#fff; --border:#e5e7eb; --text:#111827; --muted:#6b7280 }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+
+  /* Topbar */
+  .topbar{display:flex;gap:12px;align-items:center;background:var(--brand);color:#fff;padding:14px 16px}
+  .topbar a{color:#fff;text-decoration:none}
+  .topbar b{letter-spacing:.3px}
+
+  /* Layout */
+  .container{max-width:1100px;margin:16px auto;padding:0 12px}
+  .card{background:var(--card);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:18px;margin:12px auto}
+
+  /* Form đẹp & to hơn */
+  .search-grid{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr auto;
+    gap:12px;
+    align-items:center;
+  }
+  @media (max-width:900px){
+    .search-grid{grid-template-columns:1fr}
+  }
+
+  .input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    font-size:16px;
+    background:#fff;
+  }
+  .input::placeholder{color:#9aa1ab}
+  .input:focus{border-color:var(--brand);outline:0;box-shadow:0 0 0 3px rgba(160,0,0,.12)}
+
+  .btn{
+  display:inline-block;
+  min-width:190px;        /* rộng hơn */
+  text-align:center;
+  padding:12px 18px;
+  border-radius:14px;
+  border:none;
+  font-weight:800;
+  font-size:16px;         /* cỡ chữ như nút trang chủ */
+  text-decoration:none;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn-primary{
+  background:var(--brand);
+  color:#fff;
+  box-shadow:0 10px 20px rgba(160,0,0,.18);
+}
+
+.btn-primary:hover{background:var(--brand-600);transform:translateY(-2px)}
+.btn-primary:active{transform:scale(.98)}
+.btn:focus-visible{outline:3px solid #FFD966;outline-offset:2px}
+
+  /* Bảng kết quả */
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left}
+  th{background:#fafafa}
+  .muted{color:var(--muted)}
+</style>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+  }
+</script>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <b>KẾT QUẢ CỦA TÔI</b>
+  </div>
+
+  <main class="container">
+    <section class="card">
+      <div class="search-grid">
+        <input id="name" class="input" placeholder="Họ và tên" autocomplete="name">
+        <input id="unit" class="input" placeholder="Đơn vị">
+        <button id="search" class="btn btn-primary" type="button">Tra cứu</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="box" class="muted">Nhập Họ tên và Đơn vị để tra cứu.</div>
+    </section>
+  </main>
+
+<script>
+  const API='https://script.google.com/macros/s/AKfycbxJ2_4awzWex0e9nOcGOK6Ws6B2YzVPOEgvg_pXDhrRDko3RYhaFdxhlNVrLGRuVyRyxg/exec';
+
+  const nameEl = document.getElementById('name');
+  const unitEl = document.getElementById('unit');
+  const box    = document.getElementById('box');
+  const btn    = document.getElementById('search');
+
+  // Enter để tra cứu nhanh
+  [nameEl, unitEl].forEach(el => el.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); doSearch(); }
+  }));
+  btn.addEventListener('click', doSearch);
+
+  async function doSearch(){
+    const name = nameEl.value.trim();
+    const unit = unitEl.value.trim();
+    if(!name || !unit){ alert('Vui lòng nhập đầy đủ Họ tên và Đơn vị.'); return; }
+
+    btn.disabled = true; btn.textContent = 'Đang tra cứu…';
+    box.classList.add('muted'); box.textContent='Đang tải dữ liệu…';
+    try{
+      const url=`${API}?action=myResults&name=${encodeURIComponent(name)}&unit=${encodeURIComponent(unit)}`;
+      const res=await fetch(url,{cache:'no-store'});
+      const data=await res.json();
+      const rows=Array.isArray(data.rows)?data.rows:[];
+      if(!rows.length){ box.textContent='Không có dữ liệu phù hợp.'; }
+      else{
+        box.classList.remove('muted');
+        box.innerHTML = `<table>
+          <thead><tr><th>Thời gian</th><th>Mã đề</th><th>Điểm</th><th>Tổng</th></tr></thead>
+          <tbody>
+            ${rows.map(r=>`<tr>
+              <td>${escapeHtml(r.time||'')}</td>
+              <td>${escapeHtml(r.examCode||'')}</td>
+              <td>${escapeHtml(r.score||'')}</td>
+              <td>${escapeHtml(r.total||'')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+      }
+    }catch(_){
+      box.textContent='Không truy vấn được. Cần triển khai action "myResults" ở Apps Script.';
+    }finally{
+      btn.disabled = false; btn.textContent = 'Tra cứu';
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+</script>
+</body>
+</html>

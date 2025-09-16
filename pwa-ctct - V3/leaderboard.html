@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bảng xếp hạng – CTĐ, CTCT</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root{
+      --brand:#A41919; --brand-600:#8B1616;
+      --bg:#f5f6f8; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+      --gold:#f59e0b; --silver:#94a3b8; --bronze:#b45309; --row:#fff7ed;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .topbar{display:flex;gap:12px;align-items:center;background:var(--brand);color:#fff;padding:14px 16px}
+    .topbar a{color:#fff;text-decoration:none}
+    .topbar h2{margin:0;font-size:18px;font-weight:800}
+    .container{max-width:1120px;margin:16px auto;padding:0 12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:16px}
+
+    /* Tabs + Filters */
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .tabs{display:flex;gap:8px}
+    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:#fff;font-weight:800;cursor:pointer}
+    .tab.active{background:var(--brand);color:#fff;box-shadow:0 6px 12px rgba(164,25,25,.2)}
+    .select,.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px}
+    .btn{background:var(--brand);color:#fff;border:none;font-weight:800;cursor:pointer}
+    .btn:hover{background:var(--brand-600)}
+    .muted{color:var(--muted)}
+
+    /* Podium */
+    .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+    .pod{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
+    .pod .place{font-size:22px;font-weight:900}
+    .pod .unit{font-weight:800}
+    .pod .score{font-size:14px;color:var(--muted)}
+    .g{color:var(--gold)} .s{color:var(--silver)} .b{color:var(--bronze)}
+    @media (max-width:680px){ .podium{grid-template-columns:1fr} }
+
+    /* Table */
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{text-align:left;padding:12px;border-bottom:1px solid var(--border);font-weight:800}
+    tbody td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tbody tr.highlight{background:var(--row)}
+    .rank-badge{display:inline-flex;align-items:center;gap:6px;font-weight:900;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff}
+    .rank-1{border-color:var(--gold); color:var(--gold)}
+    .rank-2{border-color:var(--silver); color:var(--silver)}
+    .rank-3{border-color:var(--bronze); color:var(--bronze)}
+    .prog{height:10px;background:#f3f4f6;border-radius:999px;overflow:hidden}
+    .prog>span{display:block;height:100%;background:var(--brand)}
+    .empty{padding:16px;text-align:center;color:var(--muted)}
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <h2>BẢNG XẾP HẠNG</h2>
+  </div>
+
+  <main class="container">
+    <section class="card">
+      <div class="row">
+        <!-- Tabs chế độ -->
+        <div class="tabs" role="tablist">
+          <button id="tab-unit"   class="tab active" data-group="unit"   role="tab" aria-selected="true">Theo đơn vị</button>
+          <button id="tab-person" class="tab"        data-group="person" role="tab" aria-selected="false">Theo cá nhân</button>
+        </div>
+
+        <!-- Lọc thời gian -->
+        <select id="period" class="select" title="Khoảng thời gian">
+          <option value="">Tất cả thời gian</option>
+          <option value="7d">7 ngày gần đây</option>
+          <option value="this_week">Tuần này</option>
+          <option value="last_week">Tuần trước</option>
+          <option value="this_month">Tháng này</option>
+          <option value="last_month">Tháng trước</option>
+        </select>
+        <button id="apply" class="btn">Áp dụng</button>
+      </div>
+
+      <!-- TOP 3 -->
+      <div id="podium" class="podium" hidden></div>
+
+      <!-- BẢNG -->
+      <div class="table-wrap">
+        <table>
+          <thead id="thead">
+            <!-- sẽ render theo group -->
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="5" class="empty">Đang tải xếp hạng…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ĐIỀN URL /exec của Apps Script
+    const API = 'https://script.google.com/macros/s/AKfycbxjB1D02lXhytP_cusV4dNnYnDTMF8zSbTCqdoDlA2hyf7Od7-jPSgMwtp-lQj66shAXA/exec';
+
+    // State
+    let currentGroup = 'unit'; // 'unit' | 'person'
+
+    // Sort (avg ↓, max ↓, count ↓)
+    const sortRank = (a,b)=> (Number(b.avg)-Number(a.avg)) || (Number(b.max)-Number(a.max)) || (Number(b.count)-Number(a.count));
+    const rankBadge = (i)=>{
+      const n=i+1;
+      if (n===1) return `<span class="rank-badge rank-1">🥇 TOP 1</span>`;
+      if (n===2) return `<span class="rank-badge rank-2">🥈 TOP 2</span>`;
+      if (n===3) return `<span class="rank-badge rank-3">🥉 TOP 3</span>`;
+      return `<span class="rank-badge">#${n}</span>`;
+    };
+
+    function renderHead(){
+      const th = document.getElementById('thead');
+      if (currentGroup==='person'){
+        th.innerHTML = `
+          <tr>
+            <th style="width:120px">Xếp hạng</th>
+            <th>Họ và tên</th>
+            <th style="width:180px">Đơn vị</th>
+            <th style="width:110px">SL làm</th>
+            <th style="width:320px">Điểm TB (thang 10)</th>
+            <th style="width:130px">Điểm cao nhất</th>
+          </tr>`;
+      }else{
+        th.innerHTML = `
+          <tr>
+            <th style="width:120px">Xếp hạng</th>
+            <th>Đơn vị</th>
+            <th style="width:110px">SL làm</th>
+            <th style="width:320px">Điểm TB (thang 10)</th>
+            <th style="width:130px">Điểm cao nhất</th>
+          </tr>`;
+      }
+    }
+
+    function renderPodium(rows){
+      const pod=document.getElementById('podium');
+      if (!rows.length){ pod.hidden=true; return; }
+      const top=rows.slice(0,3);
+      pod.innerHTML = top.map((r,i)=>{
+        const cls=i===0?'g':i===1?'s':'b', medal=i===0?'🥇':i===1?'🥈':'🥉';
+        const title = currentGroup==='person' ? `${r.name} — ${r.unit}` : r.unit;
+        return `<div class="pod">
+          <div class="place ${cls}">${medal} TOP ${i+1}</div>
+          <div class="unit">${title}</div>
+          <div class="score">Điểm TB: <b>${r.avg}</b> • Cao nhất: <b>${r.max}</b> • SL: ${r.count}</div>
+        </div>`;
+      }).join('');
+      pod.hidden=false;
+    }
+
+    function renderTable(rows){
+      const tb=document.getElementById('tbody');
+      if (!rows.length){
+        tb.innerHTML=`<tr><td colspan="${currentGroup==='person'?6:5}" class="empty">Không có dữ liệu trong khoảng đã chọn.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = rows.map((r,i)=>{
+        const pct=Math.max(0,Math.min(100,(Number(r.avg)/10)*100));
+        const hi=i<3?'class="highlight"':'';
+        if (currentGroup==='person'){
+          return `<tr ${hi}>
+            <td>${rankBadge(i)}</td>
+            <td><b>${r.name}</b></td>
+            <td>${r.unit}</td>
+            <td>${r.count}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="prog" style="flex:1"><span style="width:${pct}%"></span></div>
+                <div><b>${Number(r.avg).toFixed(2)}</b></div>
+              </div>
+            </td>
+            <td>${r.max}</td>
+          </tr>`;
+        }
+        return `<tr ${hi}>
+          <td>${rankBadge(i)}</td>
+          <td><b>${r.unit}</b></td>
+          <td>${r.count}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="prog" style="flex:1"><span style="width:${pct}%"></span></div>
+              <div><b>${Number(r.avg).toFixed(2)}</b></div>
+            </div>
+          </td>
+          <td>${r.max}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function fetchBoard(){
+      const period = document.getElementById('period').value || '';
+      const q = new URLSearchParams({ action:'leaderboard', group:currentGroup, period });
+      const url = `${API}?${q.toString()}`;
+
+      const tb=document.getElementById('tbody');
+      try{
+        const res = await fetch(url, { cache:'no-store' });
+        const data = await res.json();
+        let rows = Array.isArray(data.rows) ? data.rows : [];
+        rows = rows.sort(sortRank);
+        renderHead();
+        renderPodium(rows);
+        renderTable(rows);
+      }catch(_){
+        tb.innerHTML = `<tr><td colspan="${currentGroup==='person'?6:5}" class="empty">Không tải được dữ liệu xếp hạng. Kiểm tra URL Apps Script.</td></tr>`;
+      }
+    }
+
+    // Tab switching
+    function setTab(group){
+      currentGroup = group;
+      document.querySelectorAll('.tab').forEach(t=>{
+        const active = t.dataset.group === group;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', active?'true':'false');
+      });
+      fetchBoard();
+    }
+
+    document.getElementById('tab-unit').addEventListener('click', ()=>setTab('unit'));
+    document.getElementById('tab-person').addEventListener('click', ()=>setTab('person'));
+    document.getElementById('apply').addEventListener('click', fetchBoard);
+
+    // Init
+    renderHead();
+    fetchBoard();
+  </script>
+</body>
+</html>

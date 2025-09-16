@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tài liệu học tập – CTĐ, CTCT</title>
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <style>
+    :root{
+      --brand:#A41919; --brand-600:#8B1616;
+      --bg:#f5f6f8; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+
+    /* Topbar */
+    .topbar{display:flex;gap:12px;align-items:center;background:var(--brand);color:#fff;padding:14px 16px}
+    .topbar a{color:#fff;text-decoration:none}
+    .topbar h2{margin:0;font-size:18px;font-weight:800}
+
+    .container{max-width:1120px;margin:16px auto;padding:0 12px}
+
+    /* Tools */
+    .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+    .input,.select{
+      padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;
+      font-size:16px;color:var(--text);
+    }
+    .input{flex:1;min-width:220px}
+    .input:focus,.select:focus{outline:0;border-color:var(--brand);box-shadow:0 0 0 3px rgba(164,25,25,.15)}
+    .btn{
+      padding:12px 18px;border-radius:12px;border:none;cursor:pointer;
+      font-weight:800;font-size:16px;background:var(--brand);color:#fff;box-shadow:0 6px 12px rgba(164,25,25,.25);transition:.15s;
+    }
+    .btn:hover{background:var(--brand-600); transform:translateY(-2px)}
+    .btn:active{transform:scale(0.98)}
+    .muted{color:var(--muted);font-size:14px}
+
+    /* Topic group */
+    .topic{margin:12px 0 18px}
+    .topic-header{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:12px;
+      position:sticky; top:0; z-index:2;
+    }
+    .topic-title{margin:0;font-size:18px;font-weight:800}
+    .topic-count{color:var(--muted);font-size:14px}
+
+    /* Grid of cards */
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:12px}
+    @media (max-width:1024px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:680px){.grid{grid-template-columns:1fr}}
+
+    /* Card */
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:16px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06); padding:14px; display:flex; gap:12px; align-items:flex-start;
+    }
+    .thumb{
+      width:56px;height:56px;flex:0 0 56px;border-radius:12px;border:1px solid var(--border);
+      display:flex;align-items:center;justify-content:center;background:#fff;
+    }
+    .info{flex:1;min-width:0}
+    .title{margin:2px 0 4px;font-size:16px;font-weight:800;line-height:1.35}
+    .meta{margin:0 0 8px;color:var(--muted);font-size:13px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-ghost{
+      padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:700;cursor:pointer;
+      text-decoration:none;color:var(--text);transition:.15s;
+    }
+    .btn-ghost:hover{transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,.08)}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:#dc2626;color:#fff;font-weight:700;border-radius:999px;padding:4px 8px;font-size:12px}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:10px;z-index:50}
+    .modal.open{display:flex}
+    .modal-box{background:#111; width:100%; max-width:980px; height:80vh; border-radius:12px; position:relative; overflow:hidden}
+    .modal-actions{position:absolute;top:8px;right:8px;display:flex;gap:8px;z-index:2}
+    .modal-actions .btn,.modal-actions .btn-ghost{padding:8px 12px;border-radius:10px;font-size:14px}
+    iframe.pdf{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+
+    .empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:var(--muted)}
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <h2>TÀI LIỆU HỌC TẬP</h2>
+  </div>
+
+  <main class="container">
+    <!-- Tools -->
+    <div class="tools">
+      <input id="q" class="input" placeholder="Tìm theo tiêu đề/từ khóa…">
+      <select id="topic" class="select" title="Lọc theo chuyên đề">
+        <option value="">Tất cả chuyên đề</option>
+      </select>
+      <select id="year" class="select" title="Lọc theo năm cập nhật">
+        <option value="">Tất cả năm</option>
+      </select>
+      <button id="clear" class="btn" type="button">Xoá lọc</button>
+    </div>
+
+    <!-- Danh sách theo nhóm chuyên đề -->
+    <div id="root"></div>
+  </main>
+
+  <!-- Modal xem PDF -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-label="Xem tài liệu">
+    <div class="modal-box">
+      <div class="modal-actions">
+        <a id="dlBtn" class="btn-ghost" href="#" download>⬇ Tải xuống</a>
+        <button id="closeBtn" class="btn" type="button">Đóng</button>
+      </div>
+      <iframe id="pdfFrame" class="pdf" allow="fullscreen"></iframe>
+    </div>
+  </div>
+
+  <script>
+    /***** CONFIG *****/
+    const SHEET_API = 'https://script.google.com/macros/s/AKfycbxjB1D02lXhytP_cusV4dNnYnDTMF8zSbTCqdoDlA2hyf7Od7-jPSgMwtp-lQj66shAXA/exec'; // ← NHỚ thay bằng URL /exec mới
+    const MATERIALS_FOLDER_ID = '14Vwo5fxjSHtxu9mDOvNUDQrnve6pvrfK';
+
+    /***** STATE *****/
+    let FILES = []; // {id,title,url,updated,topic}
+    let YEARS = [];
+    let TOPICS = [];
+
+    const fmt = new Intl.DateTimeFormat('vi-VN', { dateStyle:'medium', timeStyle: 'short' });
+    const isNew = (d) => {
+      try { return (Date.now() - new Date(d).getTime()) <= 7*24*3600*1000; }
+      catch { return false; }
+    };
+    const getYear = (d) => { try { return new Date(d).getFullYear(); } catch { return ''; } };
+
+    /***** RENDER *****/
+    function renderGroups(list){
+      const root = document.getElementById('root');
+      if (!list.length){
+        root.innerHTML = '<div class="empty">Chưa có PDF trong thư mục đã chỉ định.</div>';
+        return;
+      }
+
+      // group by topic
+      const map = new Map();
+      for (const f of list){
+        const t = f.topic || 'Chưa phân loại';
+        if (!map.has(t)) map.set(t, []);
+        map.get(t).push(f);
+      }
+
+      // sort topic name asc
+      const ordered = Array.from(map.entries()).sort((a,b)=> a[0].localeCompare(b[0], 'vi'));
+
+      root.innerHTML = ordered.map(([topic, files]) => `
+        <section class="topic">
+          <div class="topic-header">
+            <h3 class="topic-title">${topic}</h3>
+            <div class="topic-count">${files.length} tài liệu</div>
+          </div>
+          <div class="grid">
+            ${files.map((f,idx) => {
+              const badge = isNew(f.updated) ? '<span class="badge">NEW</span>' : '';
+              const dateStr = f.updated ? fmt.format(new Date(f.updated)) : '';
+              return `
+                <article class="card">
+                  <div class="thumb" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 2h7l5 5v15H6V2z" stroke="#991B1B" stroke-width="1.5" fill="#fff"/>
+                      <path d="M13 2v5h5" stroke="#991B1B" stroke-width="1.5"/>
+                      <text x="7" y="17" font-size="8" font-weight="700" fill="#991B1B">PDF</text>
+                    </svg>
+                  </div>
+                  <div class="info">
+                    <h4 class="title">${f.title || 'Tài liệu'}</h4>
+                    <p class="meta">Cập nhật: ${dateStr} ${badge}</p>
+                    <div class="actions">
+                      <button class="btn" data-open="${f.id}" data-url="${f.url}" type="button">Xem trực tuyến</button>
+                      <a class="btn-ghost" href="${f.url}" target="_blank" rel="noopener">Mở tab mới</a>
+                      <a class="btn-ghost" href="${f.url.replace('/preview','/view?usp=drivesdk')}" target="_blank" rel="noopener">Tải xuống</a>
+                    </div>
+                  </div>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        </section>
+      `).join('');
+
+      // bind open modal
+      root.querySelectorAll('button[data-open]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const url = btn.getAttribute('data-url');
+          openModal(url);
+        });
+      });
+    }
+
+    function renderFilters(){
+      const yearSel = document.getElementById('year');
+      const topicSel = document.getElementById('topic');
+      yearSel.innerHTML = `<option value="">Tất cả năm</option>` + YEARS.map(y=>`<option value="${y}">${y}</option>`).join('');
+      topicSel.innerHTML = `<option value="">Tất cả chuyên đề</option>` + TOPICS.map(t=>`<option value="${t}">${t}</option>`).join('');
+    }
+
+    /***** MODAL *****/
+    function openModal(url){
+      const modal = document.getElementById('modal');
+      const iframe = document.getElementById('pdfFrame');
+      const dl = document.getElementById('dlBtn');
+      iframe.src = url;
+      dl.href = url.replace('/preview','/view?usp=drivesdk');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){
+      const modal = document.getElementById('modal');
+      const iframe = document.getElementById('pdfFrame');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      iframe.src = 'about:blank';
+    }
+    document.getElementById('closeBtn').addEventListener('click', closeModal);
+    document.getElementById('modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') closeModal(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+    /***** FILTERING *****/
+    function applyFilter(){
+      const kw = document.getElementById('q').value.trim().toLowerCase();
+      const y  = document.getElementById('year').value;
+      const t  = document.getElementById('topic').value;
+
+      const view = FILES.filter(f=>{
+        const okKW = !kw || (f.title||'').toLowerCase().includes(kw);
+        const okY  = !y || String(getYear(f.updated))===String(y);
+        const okT  = !t || String(f.topic||'')===t;
+        return okKW && okY && okT;
+      });
+      renderGroups(view);
+    }
+
+    /***** LOAD *****
+     * Back-end trả: { id,title,url,updated,topic }
+     */
+    async function loadFiles(){
+      const root = document.getElementById('root');
+      root.innerHTML = '<div class="empty">Đang tải tài liệu…</div>';
+      try{
+        const url = `${SHEET_API}?action=materials&folderId=${encodeURIComponent(MATERIALS_FOLDER_ID)}`;
+        const res = await fetch(url, { cache:'no-store' });
+        const data = await res.json();
+        FILES = Array.isArray(data.files) ? data.files : [];
+
+        YEARS  = Array.from(new Set(FILES.map(f=>getYear(f.updated)).filter(Boolean))).sort((a,b)=>b-a);
+        TOPICS = Array.from(new Set(FILES.map(f=>f.topic||'Chưa phân loại'))).sort((a,b)=>a.localeCompare(b,'vi'));
+
+        renderFilters();
+        applyFilter();
+      }catch(err){
+        root.innerHTML = '<div class="empty">Không tải được danh sách tài liệu. Kiểm tra URL Apps Script và quyền chia sẻ thư mục.</div>';
+      }
+    }
+
+    // Events
+    document.getElementById('q').addEventListener('input', applyFilter);
+    document.getElementById('year').addEventListener('change', applyFilter);
+    document.getElementById('topic').addEventListener('change', applyFilter);
+    document.getElementById('clear').addEventListener('click', ()=>{
+      document.getElementById('q').value='';
+      document.getElementById('year').value='';
+      document.getElementById('topic').value='';
+      applyFilter();
+    });
+
+    // Init
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', loadFiles);
+    } else {
+      loadFiles();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+/* ===== Base ===== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:#f6f7fb;
+  color:#111;
+}
+
+:root{
+  --home-brand:#A41919;
+  --home-cream:#FFF2CC; /* vàng sáng hơn */
+  --home-muted:#6B7280;
+  --home-btn-beige:#FCE8B2;
+}
+
+/* ===== TRANG CHỦ (HOME) ===== */
+body.home{
+  background-image:url("assets/bg-desktop.png") !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-attachment:fixed !important;
+  background-size:cover !important;
+  color:#fff;
+  min-height:100vh;
+  position:relative;
+}
+@media (max-width:768px){
+  body.home{background-image:url("assets/bg-mobile.png") !important;}
+}
+
+/* Lớp phủ */
+.home-overlay{position:fixed;inset:0;background:rgba(160,0,0,.45);pointer-events:none;z-index:0}
+
+/* Tiêu đề */
+.home-hero{position:relative;z-index:1;text-align:center;padding:40px 16px 20px}
+.home-hero h1{
+  margin:0;font-size:28px;line-height:1.3;font-weight:800;text-transform:uppercase;
+  text-shadow:0 2px 10px rgba(0,0,0,.35);color:#FFD966; /* vàng sáng hơn */
+}
+
+/* Lưới + Card */
+.home-wrap{position:relative;z-index:1}
+.home-grid{
+  max-width:1040px;margin:0 auto;padding:24px 16px;
+  display:grid;gap:28px;grid-template-columns:repeat(3,minmax(320px,1fr));
+  justify-content:center;
+}
+@media (max-width:1024px){
+  .home-grid{grid-template-columns:repeat(2,minmax(280px,1fr));}
+}
+@media (max-width:680px){
+  .home-grid{grid-template-columns:1fr;gap:20px}
+}
+
+.home-card{
+  background:var(--home-cream);
+  border-radius:22px;padding:28px 24px;min-height:420px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  border:1px solid rgba(0,0,0,.06);box-shadow:0 14px 36px rgba(0,0,0,.25);
+  transition:.2s;cursor:pointer;
+}
+.home-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.25)}
+.home-card.home-active{border-color:var(--home-brand)}
+.home-card:focus-visible{outline:3px solid #FFD966;outline-offset:4px}
+
+/* Card “Tra cứu kết quả” đứng yên */
+.home-card[data-static="1"]{cursor:default}
+.home-card[data-static="1"]:hover{transform:none;box-shadow:0 14px 36px rgba(0,0,0,.25)}
+
+.home-icon-img{width:110px;height:110px;object-fit:contain;display:block;margin:0 auto 16px}
+.home-card h3{margin:4px 0 8px;font-size:22px;font-weight:800;color:#082032}
+.home-card p{margin:0 0 18px;color:#374151;font-size:15px;line-height:1.5;max-width:330px}
+
+/* Nút chính trên card */
+.home-btn{
+  margin-top:auto;min-width:190px;width:220px;text-align:center;
+  padding:12px 18px;border-radius:14px;border:none;
+  font-weight:800;text-decoration:none;cursor:pointer;transition:.2s;display:inline-block;
+}
+.home-btn.is-disabled{background:var(--home-btn-beige);color:#0F172A;box-shadow:0 1px 0 rgba(0,0,0,.05);pointer-events:none}
+.home-btn.is-active{background:var(--home-brand);color:#fff;box-shadow:0 10px 20px rgba(164,25,25,.32)}
+.home-btn:hover{transform:translateY(-2px);}
+
+/* Footer */
+.home-footer{
+  position:relative;z-index:1;text-align:center;color:#FFD966;font-size:14px;
+  padding-bottom:26px;text-shadow:0 1px 4px rgba(0,0,0,.35)
+}
+
+/* ===== MOBILE ===== */
+@media (max-width:680px){
+  .home-card{
+    width:88%;
+    max-width:320px;
+    margin:0 auto;
+    min-height:320px;
+    padding:20px 16px;
+  }
+  .home-icon-img{width:80px;height:80px;margin-bottom:10px}
+  .home-card h3{font-size:19px}
+  .home-card p{font-size:14px;max-width:unset}
+  .home-btn{width:100%;max-width:200px;padding:10px 14px}
+}
+
+/* ===== LANDSCAPE ===== */
+@media (orientation:landscape) and (max-height:480px){
+  .home-grid{grid-template-columns:repeat(2,minmax(240px,1fr));gap:16px}
+  .home-card{min-height:280px;padding:16px}
+  .home-icon-img{width:70px;height:70px}
+  .home-card h3{font-size:18px}
+  .home-card p{font-size:13px}
+  .home-btn{padding:8px 12px;max-width:180px}
+}
+
+/* ===== Nút phụ trong card Tra cứu kết quả ===== */
+.sub-links,
+.home-actions{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  margin-top:12px;
+}
+
+/* 3 nút phụ: cùng kích thước với .home-btn (desktop 220px, mobile 200px) */
+.home-subbtn,
+.home-cta{
+  display:block;
+  width:220px;
+  max-width:220px;
+  text-align:center;
+  padding:12px 16px;
+  border-radius:14px;
+  font-weight:800;
+  text-decoration:none;
+  cursor:pointer;
+
+  background:var(--home-btn-beige);
+  color:#0F172A;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+}
+
+/* Hover: zoom nhẹ (desktop có hover) */
+@media (hover:hover){
+  .home-subbtn:hover,
+  .home-cta:hover{ transform:scale(1.03); box-shadow:0 8px 18px rgba(0,0,0,.16); }
+}
+
+/* Nhấn: đỏ, chữ trắng (điện thoại & desktop) */
+.home-subbtn:active,
+.home-cta:active,
+.home-subbtn.is-active,
+.home-cta.is-active{
+  background:var(--home-brand);
+  color:#fff;
+  box-shadow:0 10px 20px rgba(164,25,25,.28);
+}
+
+/* Focus A11y */
+.home-subbtn:focus-visible,
+.home-cta:focus-visible{ outline:3px solid #FFD966; outline-offset:2px; }
+
+/* Desktop rộng: có thể tăng nhẹ nếu muốn, nhưng vẫn đồng bộ với .home-btn */
+@media (min-width:1024px){
+  /* giữ 220px để khớp .home-btn */
+}
+
+/* Mobile dọc: 200px để khớp .home-btn */
+@media (max-width:680px){
+  .home-subbtn,
+  .home-cta{ width:200px; max-width:200px; padding:10px 14px; }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "/",
+  "name": "Kiểm tra CTĐ, CTCT - Đơn vị",
+  "short_name": "CTCT",
+  "description": "Ứng dụng học tập và kiểm tra nhận thức chính trị của đơn vị.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone"],
+  "orientation": "any",           // <— cho phép xoay ngang/dọc
+  "background_color": "#8B0000",
+  "theme_color": "#8B0000",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tài liệu học tập",
+      "short_name": "Tài liệu",
+      "url": "./materials.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Làm bài kiểm tra",
+      "short_name": "Kiểm tra",
+      "url": "./quiz.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+    {
+      "name": "Kết quả của tôi",
+      "short_name": "Của tôi",
+      "url": "./my-results.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Bảng xếp hạng",
+      "short_name": "Xếp hạng",
+      "url": "./leaderboard.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

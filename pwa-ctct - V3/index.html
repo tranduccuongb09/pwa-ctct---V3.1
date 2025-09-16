@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CTĐ, CTCT – Trang chủ</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</head>
+<body class="home">
+  <div class="home-overlay" aria-hidden="true"></div>
+
+  <header class="home-hero">
+    <h1>ỨNG DỤNG HỌC TẬP VÀ KIỂM TRA NHẬN THỨC CHÍNH TRỊ<br>
+      CỦA BAN CHỈ HUY PTKV3 – TÂN YÊN/BỘ CHQS TỈNH BẮC NINH</h1>
+  </header>
+
+  <div class="home-wrap">
+    <main class="home-grid">
+      <!-- 1) Tài liệu học tập -->
+      <section class="home-card" data-link="materials.html">
+        <img class="home-icon-img" src="icons/icon-materials.png" alt="Tài liệu học tập">
+        <h3>Tài liệu học tập</h3>
+        <p>Nơi lưu trữ tài liệu học tập chính trị trong năm 2025.</p>
+        <a class="home-btn is-disabled">Mở tài liệu</a>
+      </section>
+
+      <!-- 2) Làm bài kiểm tra -->
+      <section class="home-card" data-link="quiz.html">
+        <img class="home-icon-img" src="icons/icon-exam.png" alt="Làm bài kiểm tra">
+        <h3>Làm bài kiểm tra</h3>
+        <p>30 câu – 30 phút. Hệ thống tự chấm điểm và ghi kết quả.</p>
+        <a class="home-btn is-disabled">Vào làm bài</a>
+      </section>
+
+      <!-- 3) Tra cứu kết quả (card đứng yên, không có cơ chế chọn card) -->
+      <section class="home-card" data-static="1">
+        <img class="home-icon-img" src="icons/icon-results.png" alt="Tra cứu kết quả">
+        <h3>Tra cứu kết quả</h3>
+        <p>Xem lại kết quả kiểm tra nhận thức.</p>
+
+        <!-- Ba nút cùng kích thước & hành vi -->
+        <div class="home-actions" aria-label="Liên kết nhanh">
+          <a class="home-cta"
+             href="https://docs.google.com/spreadsheets/d/1REnIveQbSDWIHZcPCyx5NCLxxEpH-cxZ178V201pgVE/edit?usp=sharing"
+             target="_blank" rel="noopener">Kết quả kiểm tra</a>
+
+          <a class="home-cta" href="my-results.html">Kết quả của tôi</a>
+          <a class="home-cta" href="leaderboard.html">Bảng xếp hạng</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="home-footer">© Đơn vị: Ban Chỉ huy PTKV3 – Tân Yên</footer>
+  </div>
+
+  <script>
+    // Cơ chế "chọn card → bật nút" chỉ áp dụng cho các card KHÔNG có data-static
+    document.querySelectorAll('.home-card:not([data-static="1"])').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        document.querySelectorAll('.home-card:not([data-static="1"])').forEach(c=>{
+          c.classList.remove('home-active');
+          const b=c.querySelector('.home-btn');
+          if(b){ b.classList.remove('is-active'); b.classList.add('is-disabled'); }
+        });
+        card.classList.add('home-active');
+        const btn=card.querySelector('.home-btn');
+        if(btn){
+          btn.classList.remove('is-disabled'); btn.classList.add('is-active');
+          const href=card.dataset.link||'#';
+          const blank=card.dataset.blank==='1';
+          btn.href=href; btn.target=blank?'_blank':'_self';
+        }
+      });
+    });
+
+    // Mobile: khi chạm vào các nút phụ thì đổi đỏ trong lúc nhấn
+    document.querySelectorAll('.home-cta').forEach(a=>{
+      a.addEventListener('touchstart', ()=> a.classList.add('is-active'), {passive:true});
+      a.addEventListener('touchend',   ()=> a.classList.remove('is-active'));
+      a.addEventListener('touchcancel',()=> a.classList.remove('is-active'));
+    });
+  </script>
+</body>
+</html>

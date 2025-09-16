@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tài liệu học tập – CTĐ, CTCT</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</head>
+<body>
+  <nav class="topbar">
+    <a href="index.html" class="back">← Trang chủ</a>
+    <h2>TÀI LIỆU HỌC TẬP</h2>
+  </nav>
+
+  <main class="container">
+    <section class="study-card">
+      <p>Đặt file PDF của đơn vị vào thư mục <code>/assets</code> và sửa đường dẫn bên dưới. Mặc định là <code>tailieu-mau.pdf</code>.</p>
+      <div class="pdf-wrapper">
+        <iframe src="assets/tailieu-mau.pdf" title="Tài liệu học tập" class="pdf" loading="lazy"></iframe>
+      </div>
+      <p><a class="btn" href="assets/tailieu-mau.pdf" target="_blank" rel="noopener">Tải tài liệu (PDF)</a></p>
+    </section>
+  </main>
+</body>
+</html>

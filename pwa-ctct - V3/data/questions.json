@@ -1,0 +1,82 @@
+[
+  {
+    "question": "Chủ nghĩa Mác – Lênin gồm mấy bộ phận cấu thành?",
+    "options": {
+      "A": "Hai bộ phận",
+      "B": "Ba bộ phận",
+      "C": "Bốn bộ phận",
+      "D": "Năm bộ phận"
+    },
+    "answer": "B"
+  },
+  {
+    "question": "Tư tưởng Hồ Chí Minh là gì?",
+    "options": {
+      "A": "Hệ thống quan điểm toàn diện và sâu sắc về cách mạng Việt Nam",
+      "B": "Một trường phái triết học phương Tây",
+      "C": "Một phong trào yêu nước đầu thế kỷ XX",
+      "D": "Một học thuyết quân sự hiện đại"
+    },
+    "answer": "A"
+  },
+  {
+    "question": "Đường lối quân sự của Đảng dựa trên nguyên tắc nào?",
+    "options": {
+      "A": "Phòng ngự là chính",
+      "B": "Tiến công là chủ đạo",
+      "C": "Kết hợp xây dựng và bảo vệ Tổ quốc",
+      "D": "Tự vệ tuyệt đối"
+    },
+    "answer": "C"
+  },
+  {
+    "question": "Quân đội nhân dân Việt Nam mang bản chất giai cấp nào?",
+    "options": {
+      "A": "Giai cấp tư sản",
+      "B": "Giai cấp nông dân",
+      "C": "Giai cấp công nhân, nhân dân lao động và của dân tộc",
+      "D": "Giai cấp tiểu thương"
+    },
+    "answer": "C"
+  },
+  {
+    "question": "Phương châm huấn luyện chiến đấu trong Quân đội là gì?",
+    "options": {
+      "A": "Cơ bản, thiết thực, vững chắc",
+      "B": "Nhanh, mạnh, bí mật",
+      "C": "Chính xác, an toàn, tiết kiệm",
+      "D": "Hiên ngang, dũng cảm, mưu trí"
+    },
+    "answer": "A"
+  },
+  {
+    "question": "Một trong những nội dung của CTĐ, CTCT là gì?",
+    "options": {
+      "A": "Công tác hậu cần",
+      "B": "Công tác tư tưởng",
+      "C": "Công tác kỹ thuật",
+      "D": "Công tác tài chính"
+    },
+    "answer": "B"
+  },
+  {
+    "question": "Kỷ luật Quân đội nhân dân Việt Nam yêu cầu gì?",
+    "options": {
+      "A": "Tự giác, nghiêm minh",
+      "B": "Khoan dung, linh hoạt",
+      "C": "Tự do, sáng tạo",
+      "D": "Tùy nghi, linh hoạt"
+    },
+    "answer": "A"
+  },
+  {
+    "question": "Nguyên tắc tổ chức của Quân đội nhân dân Việt Nam là gì?",
+    "options": {
+      "A": "Tập trung dân chủ",
+      "B": "Tam quyền phân lập",
+      "C": "Tập quyền tuyệt đối",
+      "D": "Phân tán tự trị"
+    },
+    "answer": "A"
+  }
+]
