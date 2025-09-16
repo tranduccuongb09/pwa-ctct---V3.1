@@ -1,6 +1,6 @@
 /***************** CTĐ, CTCT – APP.JS (Mức 3) *****************/
 
-const SHEET_API = 'https://script.google.com/macros/s/AKfycbw0uB4bcvaqX6kx2CIG4i_k_vMj0qMQKKQsYv3AKqs0iGfKlfSIdymgEEI8f5uyIznI5w/exec/exec';
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbzTWwWlLoUdAej0wVUXWw_aO08xF8QMLyU_2VcUki-3u23s20xScNZF0kzMuo9C23Vcsw/exec';
 const BANKS_FOLDER_ID = '1_-YhEHfYfF957yC6o-xyiPk06XRheKb6';
 
 const TOTAL_QUESTIONS  = 30;
@@ -235,4 +235,5 @@ window.addEventListener('DOMContentLoaded', ()=>{
     }
   }
 });
+
 
